@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pablo Créa | Portfolio Futuriste</title>
+    
+    <!-- 1. TAILWIND CSS (Pour le design rapide) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. GOOGLE FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <!-- 3. CONFIGURATION TAILWIND (Couleurs personnalisées) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyan: { 400: '#06b6d4', 500: '#06b6d4', 950: '#083344' }, // Primary
+                        slate: { 900: '#0f172a', 950: '#020617' }, // Backgrounds
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- 4. STYLES PERSONNALISÉS -->
+    <style>
+        body {
+            background-color: #020617; /* Slate 950 */
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+        
+        /* Cacher la scrollbar par défaut mais garder le scroll */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+
+        /* Curseur Custom */
+        #cursor {
+            position: fixed;
+            top: 0; left: 0;
+            width: 32px; height: 32px;
+            border: 1px solid #06b6d4;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s, height 0.3s, background-color 0.3s;
+            mix-blend-mode: difference;
+            display: none; /* Caché sur mobile via JS */
+        }
+        #cursor.hovered {
+            width: 64px; height: 64px;
+            background-color: rgba(6, 182, 212, 0.1);
+            border-color: transparent;
+        }
+        #cursor-dot {
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 4px; height: 4px;
+            background-color: #06b6d4;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        /* Effet Bruit de fond (Noise) */
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.03;
+            background: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+        }
+
+        /* Classes utilitaires */
+        .interactive { cursor: none; } /* On cache le curseur système sur les éléments interactifs pour laisser le custom */
+        @media (max-width: 768px) {
+            .interactive { cursor: pointer; }
+            #cursor { display: none !important; }
+        }
+    </style>
+</head>
+<body class="font-rajdhani selection:bg-cyan-500 selection:text-black">
+
+    <!-- Bruit de fond -->
+    <div class="noise-overlay"></div>
+
+    <!-- Curseur Custom -->
+    <div id="cursor"><div id="cursor-dot"></div></div>
+
+    <!-- HEADER -->
+    <header id="navbar" class="fixed top-0 w-full z-50 py-8 transition-all duration-300">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <a href="#" class="text-2xl font-orbitron font-bold text-white tracking-widest group interactive">
+                PABLO<span class="text-cyan-400 group-hover:animate-pulse">.</span>CRÉA
+            </a>
+
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#portfolio" class="nav-link text-sm uppercase tracking-widest text-slate-300 hover:text-cyan-400 transition-colors interactive">Portfolio</a>
+                <a href="#video" class="nav-link text-sm uppercase tracking-widest text-slate-300 hover:text-cyan-400 transition-colors interactive">Vidéos</a>
+                <a href="#contact" class="px-6 py-2 bg-white/10 hover:bg-cyan-500 hover:text-black border border-white/20 hover:border-cyan-500 rounded-full transition-all duration-300 interactive font-medium backdrop-blur-sm">
+                    Me Contacter
+                </a>
+            </nav>
+
+            <!-- Mobile Toggle -->
+            <button id="menu-btn" class="md:hidden text-white interactive">
+                <i data-lucide="menu"></i>
+            </button>
+        </div>
+
+        <!-- Mobile Menu (Hidden by default) -->
+        <div id="mobile-menu" class="hidden absolute top-full left-0 w-full bg-slate-950 border-t border-white/10 p-8 flex flex-col items-center space-y-6">
+            <a href="#portfolio" class="text-2xl font-orbitron text-white">Portfolio</a>
+            <a href="#video" class="text-2xl font-orbitron text-white">Vidéos</a>
+            <a href="#contact" class="text-xl text-cyan-400 border border-cyan-400 px-8 py-3 rounded-full">Me Contacter</a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        <!-- HERO SECTION -->
+        <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
+            <!-- Blobs d'arrière plan -->
+            <div class="absolute top-20 right-[10%] w-64 h-64 bg-cyan-500/20 rounded-full blur-[100px] animate-pulse"></div>
+            <div class="absolute bottom-20 left-[10%] w-96 h-96 bg-purple-500/10 rounded-full blur-[100px]"></div>
+
+            <div class="container mx-auto px-6 z-10 grid md:grid-cols-2 gap-12 items-center">
+                <div class="order-2 md:order-1 hero-text-content">
+                    <div class="mb-6 overflow-hidden">
+                        <!-- TITRE CORRIGÉ : TEXTE BLANC POUR MEILLEURE VISIBILITÉ -->
+                        <h1 class="text-5xl md:text-8xl font-orbitron font-black text-white leading-tight">
+                            <span class="hero-word inline-block">Imaginer.</span><br>
+                            <span class="hero-word inline-block">Déformer.</span><br>
+                            <span class="hero-word inline-block">Captiver.</span>
+                        </h1>
+                    </div>
+
+                    <p class="hero-fade text-lg md:text-xl text-slate-400 max-w-md leading-relaxed border-l-2 border-cyan-500 pl-6 mb-8 opacity-0 translate-y-4">
+                        Designer & réalisateur d'expériences visuelles. J'explore l'espace entre l'objet et l'émotion, en sculptant images et mouvements qui retiennent le regard.
+                    </p>
+
+                    <div class="hero-fade flex flex-wrap gap-4 opacity-0 translate-y-4">
+                        <div class="flex items-center space-x-2 text-cyan-400 bg-cyan-950/30 px-4 py-2 rounded border border-cyan-900/50">
+                            <i data-lucide="eye" size="16"></i><span class="text-sm uppercase tracking-wider">Photographe</span>
+                        </div>
+                        <div class="flex items-center space-x-2 text-cyan-400 bg-cyan-950/30 px-4 py-2 rounded border border-cyan-900/50">
+                            <i data-lucide="aperture" size="16"></i><span class="text-sm uppercase tracking-wider">Vidéaste</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-1 md:order-2 flex justify-center relative hero-img opacity-0 scale-90">
+                    <div class="relative w-72 h-72 md:w-96 md:h-96">
+                        <div class="absolute inset-0 border-2 border-dashed border-slate-700 rounded-full animate-[spin_10s_linear_infinite]"></div>
+                        <div class="absolute inset-4 border border-cyan-500/30 rounded-full animate-[spin_15s_linear_infinite_reverse]"></div>
+                        <div class="absolute inset-0 rounded-full overflow-hidden bg-slate-800 flex items-center justify-center group interactive">
+                            <img src="assets/imgi_1_498149027_17846052282476197_6351346800384771956_n.jpg" alt="Portrait" class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 grayscale hover:grayscale-0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+                <i data-lucide="arrow-down" class="text-slate-500"></i>
+            </div>
+        </section>
+
+        <!-- PORTFOLIO SECTION -->
+        <section id="portfolio" class="py-24 bg-slate-950 relative">
+            <div class="container mx-auto px-6">
+                <!-- Section Title -->
+                <div class="mb-12 md:mb-24 relative scroll-reveal">
+                    <h2 class="text-5xl md:text-7xl font-bold font-orbitron tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-white to-slate-500">
+                        Catalogue
+                    </h2>
+                    <div class="h-1 w-24 bg-cyan-500 mt-4"></div>
+                    <p class="absolute -top-6 left-1 text-cyan-400 text-sm font-mono tracking-widest uppercase opacity-80">01. Work //</p>
+                </div>
+
+                <!-- Filters -->
+                <div class="flex flex-wrap gap-4 mb-12" id="filters">
+                    <button class="filter-btn active px-6 py-2 rounded-full text-sm font-mono uppercase tracking-widest transition-all interactive bg-cyan-500 text-black font-bold" data-filter="All">All</button>
+                    <button class="filter-btn px-6 py-2 rounded-full text-sm font-mono uppercase tracking-widest transition-all interactive bg-slate-900 text-slate-400 border border-slate-800 hover:border-cyan-500/50 hover:text-white" data-filter="Automobile">Automobile</button>
+                </div>
+
+                <!-- Grid (Injectée via JS) -->
+                <div id="portfolio-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- JS creates items here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VIDEO SECTION -->
+        <section id="video" class="py-24 bg-slate-900 relative overflow-hidden">
+            <div class="container mx-auto px-6 relative z-10">
+                <div class="mb-12 relative scroll-reveal">
+                    <h2 class="text-5xl md:text-7xl font-bold font-orbitron text-white">Séquences</h2>
+                    <div class="h-1 w-24 bg-cyan-500 mt-4"></div>
+                    <p class="absolute -top-6 left-1 text-cyan-400 text-sm font-mono tracking-widest uppercase opacity-80">02. Motion //</p>
+                </div>
+
+                <div class="flex overflow-x-auto space-x-8 pb-8 snap-x scrollbar-hide" id="video-container">
+                    <!-- JS injects videos here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- CONTACT SECTION -->
+        <section id="contact" class="py-24 relative bg-slate-950">
+            <div class="container mx-auto px-6 grid md:grid-cols-2 gap-16">
+                <div class="scroll-reveal">
+                    <div class="mb-8 relative">
+                        <h2 class="text-5xl md:text-7xl font-bold font-orbitron text-white">Projet ?</h2>
+                        <p class="absolute -top-6 left-1 text-cyan-400 text-sm font-mono tracking-widest uppercase opacity-80">03. Connect //</p>
+                    </div>
+                    <p class="text-slate-400 text-lg mb-8 font-light">Je suis disponible pour des missions freelance et des collaborations créatives.</p>
+                    
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-4 text-slate-300 group interactive">
+                            <div class="p-3 bg-slate-900 rounded-full border border-slate-800 group-hover:border-cyan-500 transition-colors">
+                                <i data-lucide="mail" class="text-cyan-400"></i>
+                            </div>
+                            <!-- EMAIL MIS À JOUR -->
+                            <span>dumont.pablo885@gmail.com</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/50 backdrop-blur-sm p-8 rounded-2xl border border-white/5 scroll-reveal">
+                    <form id="contact-form" class="space-y-6">
+                        <div class="group">
+                            <label class="block text-xs uppercase tracking-widest text-slate-500 mb-2">Nom</label>
+                            <input type="text" required class="w-full bg-slate-950 border-b border-slate-700 focus:border-cyan-500 outline-none py-3 text-white transition-all interactive" placeholder="Votre nom">
+                        </div>
+                        <div class="group">
+                            <label class="block text-xs uppercase tracking-widest text-slate-500 mb-2">Email</label>
+                            <input type="email" required class="w-full bg-slate-950 border-b border-slate-700 focus:border-cyan-500 outline-none py-3 text-white transition-all interactive" placeholder="email@exemple.com">
+                        </div>
+                        <!-- AJOUT DU CHAMP MESSAGE -->
+                        <div class="group">
+                            <label class="block text-xs uppercase tracking-widest text-slate-500 mb-2">Message</label>
+                            <textarea required rows="4" class="w-full bg-slate-950 border-b border-slate-700 focus:border-cyan-500 outline-none py-3 text-white transition-all interactive resize-none" placeholder="Détails du projet..."></textarea>
+                        </div>
+
+                        <button type="submit" class="w-full bg-white text-black font-bold py-4 hover:bg-cyan-400 transition-colors interactive flex items-center justify-center space-x-2">
+                            <span>Initier la transmission</span>
+                            <i data-lucide="send" size="18"></i>
+                        </button>
+                    </form>
+                    <div id="form-success" class="hidden h-full flex-col items-center justify-center text-center space-y-4 py-10">
+                        <div class="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center">
+                            <i data-lucide="check" class="text-green-400"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-white">Reçu.</h3>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- LIGHTBOX (Cachée par défaut) -->
+    <div id="lightbox" class="fixed inset-0 z-[100] bg-slate-950/95 backdrop-blur-xl hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <button id="lightbox-close" class="absolute top-6 right-6 text-white hover:text-cyan-400 interactive z-[110]">
+            <i data-lucide="x" size="32"></i>
+        </button>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-6xl h-full max-h-[90vh]">
+            <div class="relative h-full rounded-lg overflow-hidden bg-black border border-slate-800 flex items-center justify-center">
+                <img id="lb-img" src="" alt="" class="max-h-full max-w-full object-contain">
+            </div>
+            <div class="flex flex-col justify-center space-y-6 text-white">
+                <div>
+                    <h2 id="lb-title" class="text-4xl md:text-6xl font-orbitron font-bold mb-2"></h2>
+                    <p id="lb-subtitle" class="text-xl text-cyan-400"></p>
+                </div>
+                <div id="lb-tags" class="flex flex-wrap gap-2"></div>
+                <p id="lb-desc" class="text-slate-300 leading-relaxed border-l-2 border-white/20 pl-4"></p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-black py-12 border-t border-slate-900 text-center">
+        <p class="text-slate-600 text-sm">© 2025 Pablo Créa. All rights reserved.</p>
+    </footer>
+
+    <!-- SCRIPTS CDN -->
+    <!-- 1. Icones -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 2. Animations GSAP (Le moteur d'animation pro) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- LOGIQUE JAVASCRIPT -->
+    <script>
+        // --- 1. DONNÉES DU SITE (Facile à modifier) ---
+        const portfolioItems = [
+            {
+                id: 1, title: "Alpine A110S", subtitle: "Monaco", category: "Automobile",
+                tags: ["Editorial", "Speed"], image: "assets/imgi_11_547778814_17860989912476197_2207642282651692444_n.jpg",
+                desc: "Une étude cinétique sur la vitesse à l'arrêt.", aspect: "wide"
+            },
+            {
+                id: 2, title: "488 Pista Spider", subtitle: "Aérodrome", category: "Automobile",
+                tags: ["Studio", "Neon"], image: "assets/imgi_10_568674992_17865219366476197_3631275601375141636_n.jpg",
+                desc: "Exploration des textures de lumière.", aspect: "tall"
+            },
+            {
+                id: 3, title: "BMW", subtitle: "Fast & Generous", category: "Automobile",
+                tags: ["City", "Abstract"], image: "assets/imgi_75_default.png",
+                desc: "La ville déconstruite par le temps.", aspect: "square"
+            },
+            {
+                id: 4, title: "Porsche GT3 RS", subtitle: "Fast & Generous", category: "Automobile",
+                tags: ["3D", "Future"], image: "assets/imgi_77_default.png",
+                desc: "Qui sommes-nous connectés ?", aspect: "tall"
+            },
+            {
+                id: 5, title: "Mustang", subtitle: "Fast & Generous", category: "Automobile",
+                tags: ["Night", "Color"], image: "assets/imgi_78_default.png",
+                desc: "L'énergie nocturne de la mégalopole.", aspect: "wide"
+            }
+        ];
+
+        const videos = [
+            { title: "TikTok", duration: "0:45", thumb: "assets/imgi_76_default.png" },
+            { title: "Instagram", duration: "1:20", thumb: "assets/imgi_85_default.png" },
+            { title: "TikTok", duration: "0:15", thumb: "assets/imgi_81_default.png" }
+        ];
+
+        // --- 2. INITIALISATION ---
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            gsap.registerPlugin(ScrollTrigger);
+            
+            renderPortfolio();
+            renderVideos();
+            initCursor();
+            initAnimations();
+        });
+
+        // --- 3. RENDER FUNCTIONS (Générer le HTML) ---
+        function renderPortfolio() {
+            const grid = document.getElementById('portfolio-grid');
+            grid.innerHTML = portfolioItems.map(item => `
+                <div class="portfolio-item group relative cursor-pointer overflow-hidden rounded-lg bg-slate-900 border border-white/5 interactive ${item.aspect === 'wide' ? 'md:col-span-2' : ''}"
+                     data-category="${item.category}" onclick="openLightbox(${item.id})">
+                    <div class="relative h-80 w-full overflow-hidden">
+                        <img src="${item.image}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy">
+                        <div class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors"></div>
+                        <div class="absolute bottom-0 left-0 w-full p-6 bg-gradient-to-t from-black to-transparent translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                            <p class="text-cyan-400 text-xs font-mono mb-1">${item.category}</p>
+                            <h3 class="text-2xl font-bold text-white font-orbitron">${item.title}</h3>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderVideos() {
+            const container = document.getElementById('video-container');
+            container.innerHTML = videos.map(vid => `
+                <div class="min-w-[300px] md:min-w-[450px] snap-center relative group rounded-xl overflow-hidden border border-slate-800 bg-slate-950 interactive">
+                    <div class="aspect-video relative overflow-hidden">
+                        <img src="${vid.thumb}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-12 h-12 bg-white/10 backdrop-blur rounded-full flex items-center justify-center border border-white/20 group-hover:scale-125 transition-transform">
+                                <i data-lucide="play" class="fill-white text-white ml-1"></i>
+                            </div>
+                        </div>
+                        <span class="absolute bottom-3 right-3 bg-black/60 text-white text-xs px-2 py-1 rounded font-mono">${vid.duration}</span>
+                    </div>
+                    <div class="p-4"><h4 class="text-white font-bold">${vid.title}</h4></div>
+                </div>
+            `).join('');
+            lucide.createIcons(); // Re-init icons for new elements
+        }
+
+        // --- 4. LOGIQUE ---
+        
+        // Lightbox
+        function openLightbox(id) {
+            const item = portfolioItems.find(i => i.id === id);
+            if(!item) return;
+
+            document.getElementById('lb-img').src = item.image;
+            document.getElementById('lb-title').textContent = item.title;
+            document.getElementById('lb-subtitle').textContent = item.subtitle;
+            document.getElementById('lb-desc').textContent = item.desc;
+            document.getElementById('lb-tags').innerHTML = item.tags.map(t => `<span class="text-xs border border-slate-700 px-3 py-1 rounded-full text-slate-400">#${t}</span>`).join('');
+            
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('hidden');
+            // Petit délai pour l'animation d'opacité
+            requestAnimationFrame(() => lb.classList.remove('opacity-0'));
+        }
+
+        document.getElementById('lightbox-close').onclick = () => {
+            const lb = document.getElementById('lightbox');
+            lb.classList.add('opacity-0');
+            setTimeout(() => lb.classList.add('hidden'), 300);
+        };
+
+        // Filtres
+        const buttons = document.querySelectorAll('.filter-btn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Active style
+                buttons.forEach(b => {
+                    b.classList.remove('bg-cyan-500', 'text-black', 'font-bold');
+                    b.classList.add('bg-slate-900', 'text-slate-400');
+                });
+                btn.classList.remove('bg-slate-900', 'text-slate-400');
+                btn.classList.add('bg-cyan-500', 'text-black', 'font-bold');
+
+                const filter = btn.getAttribute('data-filter');
+                const items = document.querySelectorAll('.portfolio-item');
+                
+                items.forEach(item => {
+                    if(filter === 'All' || item.getAttribute('data-category') === filter) {
+                        gsap.to(item, {autoAlpha: 1, scale: 1, duration: 0.4, display: 'block'});
+                    } else {
+                        gsap.to(item, {autoAlpha: 0, scale: 0.9, duration: 0.4, display: 'none'});
+                    }
+                });
+            });
+        });
+
+        // Formulaire
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const form = e.target;
+            const btn = form.querySelector('button');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = 'Transmission...';
+            
+            setTimeout(() => {
+                form.classList.add('hidden');
+                document.getElementById('form-success').classList.remove('hidden');
+                document.getElementById('form-success').classList.add('flex');
+            }, 1500);
+        });
+
+        // --- 5. ANIMATIONS & CURSEUR ---
+        
+        function initCursor() {
+            const cursor = document.getElementById('cursor');
+            const dot = document.getElementById('cursor-dot');
+            
+            if(window.matchMedia("(pointer: fine)").matches) {
+                cursor.style.display = 'block';
+                
+                window.addEventListener('mousemove', e => {
+                    gsap.to(cursor, {x: e.clientX, y: e.clientY, duration: 0.1});
+                    gsap.to(dot, {x: 0, y: 0, duration: 0}); // Dot suit le parent
+                });
+
+                // Effet Hover sur éléments interactifs
+                document.addEventListener('mouseover', e => {
+                    if(e.target.closest('.interactive')) {
+                        cursor.classList.add('hovered');
+                    } else {
+                        cursor.classList.remove('hovered');
+                    }
+                });
+            }
+        }
+
+        function initAnimations() {
+            // Hero Animations
+            const tl = gsap.timeline();
+            tl.from(".hero-word", { y: 50, opacity: 0, stagger: 0.2, duration: 1, ease: "power4.out" })
+              .to(".hero-fade", { y: 0, opacity: 1, stagger: 0.2, duration: 0.8 }, "-=0.5")
+              .to(".hero-img", { scale: 1, opacity: 1, duration: 1 }, "-=0.8");
+
+            // Scroll Reveal pour les sections
+            gsap.utils.toArray('.scroll-reveal').forEach(section => {
+                gsap.from(section, {
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top 80%",
+                    },
+                    y: 50,
+                    opacity: 0,
+                    duration: 1,
+                    ease: "power2.out"
+                });
+            });
+
+            // Navbar sticky style
+            window.addEventListener('scroll', () => {
+                const nav = document.getElementById('navbar');
+                if(window.scrollY > 50) {
+                    nav.classList.add('bg-slate-950/80', 'backdrop-blur-md', 'py-4');
+                    nav.classList.remove('py-8');
+                } else {
+                    nav.classList.remove('bg-slate-950/80', 'backdrop-blur-md', 'py-4');
+                    nav.classList.add('py-8');
+                }
+            });
+
+            // Mobile Menu
+            const menuBtn = document.getElementById('menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            menuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+    </script>
+</body>
+</html>
